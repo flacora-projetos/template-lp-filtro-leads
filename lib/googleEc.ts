@@ -112,6 +112,16 @@ export interface GoogleEcResult {
 }
 
 export async function sendGoogleEcEvent(input: GoogleEcInput): Promise<GoogleEcResult> {
+  // Feature flag explícita — mesma lógica do ENABLE_META_CAPI em lib/metaCapi.ts:
+  // só bloqueia se alguém desligou de propósito (ENABLE_GOOGLE_EC="false").
+  // Sem o flag, o comportamento de sempre continua (dispara se a service
+  // account/customer id estiverem configurados); o flag só torna explícito
+  // nos logs quando um cliente está sem Google Ads configurado DE PROPÓSITO.
+  if (process.env.ENABLE_GOOGLE_EC === 'false') {
+    console.log('[Google EC] Desativado intencionalmente (ENABLE_GOOGLE_EC=false) — evento não enviado.');
+    return { success: false, error: 'Google EC desativado (ENABLE_GOOGLE_EC=false)' };
+  }
+
   const customerId = process.env.GOOGLE_ADS_CUSTOMER_ID;
   if (!customerId || !loadServiceAccount()) {
     return { success: false, error: 'Google Data Manager não configurado' };

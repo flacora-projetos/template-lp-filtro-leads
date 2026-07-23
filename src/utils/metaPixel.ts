@@ -1,4 +1,8 @@
-export const META_PIXEL_ID = "2060052434914188";
+// Re-exportado por compatibilidade — a fonte de verdade agora é a env var
+// META_PIXEL_ID (ver src/utils/env.ts e vite.config.ts). Sem fallback: um
+// clone novo sem essa env var configurada simplesmente não inicializa o
+// pixel (ver index.html), em vez de herdar o pixel de outro cliente.
+export { META_PIXEL_ID } from './env';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare global {

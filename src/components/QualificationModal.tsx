@@ -3,6 +3,7 @@ import { X, ArrowLeft, Check, ChevronDown } from 'lucide-react';
 import { trackCustomEvent, generateEventId, getFbpCookie, getFbcCookie, sendMetaCapiEvent } from '../utils/metaPixel';
 import { sendGoogleEcEvent } from '../utils/googleAds';
 import { pushDataLayerEvent } from '../utils/gtm';
+import { WHATSAPP_NUMBER } from '../utils/env';
 
 interface QualificationModalProps {
   isOpen: boolean;
@@ -277,7 +278,9 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({ isOpen, 
       sendMetaCapiEvent({ eventName: "CliqueSaida", eventId: eventIds.current.eventIdContact, ...capiPayloadBase });
     }
     sendDataToSheets('WhatsApp aberto(clicou para WhatsApp)', TOTAL_STEPS);
-    const phone = '5562999320675';
+    // Número que recebe a mensagem final do lead qualificado — env var
+    // WHATSAPP_NUMBER (ver .env.example), específico de cada cliente.
+    const phone = WHATSAPP_NUMBER;
     const linhas = [
       `Nome: ${data.nome}`,
       `WhatsApp: ${data.whatsapp}`,

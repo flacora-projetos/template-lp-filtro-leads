@@ -11,30 +11,33 @@ em 2026-07-23 (commit `3ebd130`, snapshot via `git archive`, sem o histórico de
 dela — repo novo, história limpa). O repo da Karyne continua intocado como cliente
 piloto; este aqui é a base pra virar template de verdade.
 
-## Status: baseline, NÃO é template genérico ainda
+## Status: Fase 1 (parametrização) concluída — ainda precisa de conteúdo/funil por cliente
 
-Isto ainda é o código específico da Dra. Karyne Magalhães (halitose/Goiânia). Falta a
-parametrização (Fase 1 do roadmap) antes de servir pra outro cliente:
+O conteúdo visível (marca, textos, fotos, funil comercial) ainda é o específico da
+Dra. Karyne Magalhães (halitose/Goiânia) — isso é esperado, é edição manual por cliente
+(ver `docs/CUSTOMIZAR-POR-CLIENTE.md`). O que a Fase 1 resolveu:
 
-- **Hardcoded → precisa virar env var**: `META_PIXEL_ID` (fallback em
-  `src/utils/metaPixel.ts` + `lib/metaCapi.ts`), GA4 `G-3783BP5DSB` e GTM
-  `GTM-P32CM7H7` (`index.html`), WhatsApp `5562999320675`
-  (`src/components/QualificationModal.tsx`), marca/textos/cores, domínio.
-  `SUPABASE_URL`/`SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` já são env.
-- **Feature flags a adicionar**: Meta CAPI e Google Enhanced Conversions deveriam ser
-  opcionais por cliente (nem todo cliente tem Google Ads/Meta Ads configurado dia 1) —
-  hoje disparam incondicionalmente se as env vars existirem.
-- **Funil do Kanban é clínico** (`contato_realizado`, `consulta_agendada`,
-  `consulta_realizada` etc., em `src/admin/types.ts` + `api/leads.ts` `STATUS_VALIDOS`)
-  — não serve 1:1 pra outros nichos (ex.: B2B/agro). Decidir se genericiza ou se vira
-  parte do processo de clonagem por cliente.
-- **Conteúdo/copy da LP** (`index.html`, componentes em `src/components/`) é 100%
-  específico da Karyne (halitose, CRO-GO, fotos dela) — precisa ser trocado por
-  cliente, não é parametrizável via env var, é edição de conteúdo mesmo.
-- **Fechamento de loop de conversões** (`api/leads.ts` `handlePatch` →
-  `dispatchConsultaRealizada`) está atrelado ao status `consulta_realizada` e à env var
-  `GOOGLE_ADS_CONVERSION_ACTION_ID_QUALIFICADO` — depende do funil clínico acima, revisar
-  junto.
+- **Virou env var (sem fallback pra credencial de cliente)**: `META_PIXEL_ID`
+  (`lib/metaCapi.ts` + `src/utils/env.ts`), `GA4_MEASUREMENT_ID` e
+  `GTM_CONTAINER_ID` (`index.html`, injetados em build/dev via plugin Vite),
+  `WHATSAPP_NUMBER` (`src/components/QualificationModal.tsx`). Ver `.env.example`.
+  Se uma dessas ficar vazia, o recurso correspondente simplesmente não inicializa
+  (sem erro) — útil pra cliente novo ainda sem uma das contas configurada.
+- **Feature flags adicionadas**: `ENABLE_META_CAPI` e `ENABLE_GOOGLE_EC`
+  (`lib/metaCapi.ts` / `lib/googleEc.ts`). Default = comportamento de sempre
+  (dispara se as credenciais estiverem configuradas); setar como `"false"`
+  desliga o envio DE PROPÓSITO e deixa isso explícito no log, distinguindo de
+  um esquecimento de configuração.
+- **Documentado, não generalizado (decisão deliberada)**: funil do Kanban
+  (`src/admin/types.ts` + `api/leads.ts` `STATUS_VALIDOS`) e o disparo de
+  fechamento de loop de conversões (`api/leads.ts` `dispatchConsultaRealizada`)
+  continuam específicos da Karyne — view completo de o que revisar/editar ao
+  clonar pra um cliente novo em **`docs/CUSTOMIZAR-POR-CLIENTE.md`**.
+- **Fora de escopo desta fase, ainda hardcoded**: marca/textos/cores/copy da LP
+  (edição de conteúdo manual por cliente, sem sistema de templating — também
+  documentado em `docs/CUSTOMIZAR-POR-CLIENTE.md`), domínio (responsabilidade do
+  deploy/DNS por cliente, não é código), URL do Google Apps Script em
+  `QualificationModal.tsx` (planilha de backup da Karyne, não avaliado nesta fase).
 
 Ver memória do projeto `produto-lp-multicliente` (sessão Claude) e
 `docs/handoff-fechar-loop-conversoes.md` /

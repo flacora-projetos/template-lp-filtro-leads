@@ -44,9 +44,6 @@ export default function App() {
     window.openQualificationModal = () => {
       setIsModalOpen(true);
     };
-    
-    // Config do WhatsApp constant as requested
-    const WHATSAPP_NUMBER = '5562999320675';
 
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);

@@ -130,45 +130,75 @@
       ]
     }
     </script>
+    <!--
+      Google tag (GA4), Google Tag Manager e Meta Pixel — IDs vêm de env var
+      (GA4_MEASUREMENT_ID, GTM_CONTAINER_ID, META_PIXEL_ID em .env.example),
+      substituídos aqui em build/dev pelo plugin `html-env-placeholders` em
+      vite.config.ts. Se uma env var não estiver configurada pra este cliente
+      (ex.: cliente novo ainda sem GTM), o placeholder vira string vazia e o
+      bloco correspondente simplesmente não inicializa nada — sem erro.
+    -->
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3783BP5DSB"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-3783BP5DSB');
+      (function () {
+        var GA4_ID = '__GA4_MEASUREMENT_ID__';
+        if (!GA4_ID) return;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA4_ID;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', GA4_ID);
+      })();
     </script>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-P32CM7H7');</script>
+    <script>
+      (function () {
+        var GTM_ID = '__GTM_CONTAINER_ID__';
+        if (!GTM_ID) return;
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',GTM_ID);
+      })();
+    </script>
     <!-- End Google Tag Manager -->
     <!-- Meta Pixel Code -->
     <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '2060052434914188');
-      fbq('track', 'PageView');
+      (function () {
+        var PIXEL_ID = '__META_PIXEL_ID__';
+        if (!PIXEL_ID) return;
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', PIXEL_ID);
+        fbq('track', 'PageView');
+      })();
     </script>
     <!-- End Meta Pixel Code -->
   </head>
   <body>
+    <!--
+      Fallbacks <noscript> só têm efeito com JS desabilitado no navegador
+      (caso raro) — se a env var correspondente estiver vazia, o placeholder
+      vira string vazia no atributo (sem erro, só não rastreia nada).
+    -->
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P32CM7H7"
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=__GTM_CONTAINER_ID__"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <!-- Meta Pixel Noscript -->
     <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=2060052434914188&ev=PageView&noscript=1"
+      src="https://www.facebook.com/tr?id=__META_PIXEL_ID__&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Noscript -->
     <div id="root">

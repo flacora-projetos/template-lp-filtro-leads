@@ -52,11 +52,21 @@ export interface MetaEventResult {
 }
 
 export async function sendMetaEvent(input: MetaEventInput): Promise<MetaEventResult> {
-  const accessToken = process.env.META_ACCESS_TOKEN;
-  const pixelId = process.env.META_PIXEL_ID || '2060052434914188';
+  // Feature flag explícita: só bloqueia se alguém desligou de propósito
+  // (ENABLE_META_CAPI="false"). Por padrão o comportamento é o de sempre —
+  // dispara se as credenciais abaixo estiverem configuradas — mas o flag dá
+  // um jeito de deixar claro nos logs que um cliente sem Meta Ads configurado
+  // está assim DE PROPÓSITO, não por erro de configuração esquecido.
+  if (process.env.ENABLE_META_CAPI === 'false') {
+    console.log('[Meta CAPI] Desativado intencionalmente (ENABLE_META_CAPI=false) — evento não enviado.');
+    return { success: false, error: 'Meta CAPI desativado (ENABLE_META_CAPI=false)' };
+  }
 
-  if (!accessToken) {
-    return { success: false, error: 'META_ACCESS_TOKEN is not configured' };
+  const accessToken = process.env.META_ACCESS_TOKEN;
+  const pixelId = process.env.META_PIXEL_ID;
+
+  if (!accessToken || !pixelId) {
+    return { success: false, error: 'META_ACCESS_TOKEN/META_PIXEL_ID não configurados' };
   }
 
   const userData: Record<string, unknown> = {
