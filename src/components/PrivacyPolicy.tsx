@@ -79,7 +79,6 @@ export const PrivacyPolicy = () => {
                 <li>facilitar a comunicação pelo WhatsApp;</li>
                 <li>orientar sobre a modalidade de avaliação mais adequada;</li>
                 <li>organizar o agendamento;</li>
-                <li>registrar o contato em planilha interna de acompanhamento;</li>
                 <li>melhorar a experiência da página;</li>
                 <li>medir o desempenho das campanhas de anúncios;</li>
                 <li>prevenir fraudes, abusos ou problemas técnicos;</li>
@@ -94,7 +93,6 @@ export const PrivacyPolicy = () => {
               </p>
               <p className="leading-relaxed mb-4">Podemos utilizar serviços como:</p>
               <ul className="list-disc pl-6 space-y-2 mb-6">
-                <li>Google Sheets e Google Apps Script, para registro interno dos contatos;</li>
                 <li>WhatsApp, para continuidade do atendimento;</li>
                 <li>Vercel, para hospedagem da página;</li>
                 <li>Google Analytics, Google Tag Manager e Google Ads, para mensuração de tráfego e campanhas;</li>

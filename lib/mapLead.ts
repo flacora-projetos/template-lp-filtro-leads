@@ -1,10 +1,10 @@
 /**
- * Mapeia o payload que a LP já envia ao Apps Script para a linha da tabela
+ * Mapeia o payload que a LP envia para /api/leads para a linha da tabela
  * `leads` do Postgres. NÃO altera o payload nem o contrato existente — apenas
  * traduz nomes camelCase → snake_case e deriva a origem.
  */
 
-export interface SheetsPayload {
+export interface LeadPayload {
   leadId?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -40,13 +40,12 @@ const clean = (v: unknown): string | null => {
 };
 
 /**
- * Deriva a origem do tráfego seguindo a mesma lógica da aba Resumo da planilha
- * (seção 19 do doc de contexto):
+ * Deriva a origem do tráfego a partir dos parâmetros de tracking do lead:
  *  - UTM Source define a origem;
  *  - sem UTM, FBCLID => Meta Ads; GCLID => Google Ads;
  *  - nada disso => Direto.
  */
-export function derivarOrigem(p: SheetsPayload): string {
+export function derivarOrigem(p: LeadPayload): string {
   const src = (clean(p.utmSource) || '').toLowerCase();
 
   if (src) {
@@ -66,7 +65,7 @@ export function derivarOrigem(p: SheetsPayload): string {
  * comerciais, que são editados manualmente no painel). `atualizado_em` é
  * cuidado pelo trigger no banco.
  */
-export function mapPayloadToRow(p: SheetsPayload) {
+export function mapPayloadToRow(p: LeadPayload) {
   return {
     lead_id: clean(p.leadId),
     etapa_funil: clean(p.status),

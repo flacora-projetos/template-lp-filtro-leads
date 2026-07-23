@@ -80,11 +80,6 @@ foi construído) nenhum sistema de templating de copy. Ao clonar:
   `WHATSAPP_NUMBER` de env var) — ex.: `src/components/Footer.tsx` e
   `src/components/PrivacyPolicy.tsx` hoje têm números da Karyne escritos
   direto no texto, fora do fluxo de qualificação de leads.
-- Ajuste a URL do Google Apps Script (`GOOGLE_SCRIPT_URL` em
-  `src/components/QualificationModal.tsx`) se o cliente novo também usar uma
-  planilha de backup — hoje aponta pro Apps Script da Karyne e não foi
-  parametrizado nesta fase (fora do escopo original, ver histórico do
-  handoff da Fase 1).
 
 ## O que É parametrizável via env var (não precisa editar código)
 

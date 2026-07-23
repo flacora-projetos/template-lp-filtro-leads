@@ -30,12 +30,10 @@ interface LeadData {
   datasOpcional: string;
 }
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypbOG2r2Zka810XL8er9zUUSGHjsscOQw_db95uh9azXYh7adlTNhAn1_u0VxzLn4/exec";
-
 /**
- * Envia o MESMO payload da planilha, em paralelo, para o mini CRM (Postgres via
- * /api/leads). Fire-and-forget e totalmente isolado: qualquer erro aqui é
- * silencioso e NÃO afeta o envio para o Apps Script/planilha nem o fluxo da LP.
+ * Envia o lead para o mini CRM (Postgres via /api/leads) — único mecanismo de
+ * ingestão da LP. Fire-and-forget e totalmente isolado: qualquer erro aqui é
+ * silencioso e NÃO afeta o fluxo da LP.
  */
 const sendLeadToCrm = (payload: Record<string, unknown>) => {
   try {
@@ -133,11 +131,6 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({ isOpen, 
           eventIdContact: eventIds.current.eventIdContact,
           ...getTrackingData()
         };
-        fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST", mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        }).catch(e => console.error(e));
         sendLeadToCrm(payload);
       }
     }
@@ -159,7 +152,7 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({ isOpen, 
 
   if (!isOpen) return null;
 
-  const sendDataToSheets = (statusOverride?: string, stepOverride?: number) => {
+  const sendDataToCrm = (statusOverride?: string, stepOverride?: number) => {
     const tracking = getTrackingData();
     const payload = {
       leadId,
@@ -184,20 +177,6 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({ isOpen, 
       ...tracking
     };
 
-    console.log("Enviando lead para Sheets:", payload);
-
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(() => console.log("Fetch para Sheets enviado (no-cors). status:", statusOverride))
-    .catch(e => console.error("Error sending lead to sheets:", e));
-
-    // Espelha o mesmo payload no mini CRM (Postgres), sem afetar o envio acima.
     sendLeadToCrm(payload);
   };
 
@@ -248,7 +227,7 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({ isOpen, 
     if (nextS === 2) status = 'Lead gerado(Lead formado)';
     if (nextS === 3) status = 'Filtro iniciado (Começou a responder)';
     if (nextS === TOTAL_STEPS) status = 'Filtro concluído(Concluiu o filtro)';
-    sendDataToSheets(status, nextS);
+    sendDataToCrm(status, nextS);
   };
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
@@ -277,7 +256,7 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({ isOpen, 
       };
       sendMetaCapiEvent({ eventName: "CliqueSaida", eventId: eventIds.current.eventIdContact, ...capiPayloadBase });
     }
-    sendDataToSheets('WhatsApp aberto(clicou para WhatsApp)', TOTAL_STEPS);
+    sendDataToCrm('WhatsApp aberto(clicou para WhatsApp)', TOTAL_STEPS);
     // Número que recebe a mensagem final do lead qualificado — env var
     // WHATSAPP_NUMBER (ver .env.example), específico de cada cliente.
     const phone = WHATSAPP_NUMBER;

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
 import { getSupabaseAdmin } from '../lib/supabaseAdmin.js';
-import { mapPayloadToRow, type SheetsPayload } from '../lib/mapLead.js';
+import { mapPayloadToRow, type LeadPayload } from '../lib/mapLead.js';
 import { requireAuth } from '../lib/requireAuth.js';
 import { sendMetaEvent } from '../lib/metaCapi.js';
 import { sendGoogleEcEvent } from '../lib/googleEc.js';
@@ -10,7 +10,7 @@ import { sendGoogleEcEvent } from '../lib/googleEc.js';
  * /api/leads
  *
  * POST  — ingestão vinda da LP (público, sem auth). Faz upsert por lead_id no
- *         Postgres, em paralelo ao Apps Script/planilha (que continua intacto).
+ *         Postgres — único mecanismo de ingestão da LP.
  *         Fire-and-forget: sempre responde 200 para não quebrar o fluxo da LP.
  *
  * GET   — listagem para o painel /admin. Exige JWT do Supabase Auth (Bearer).
@@ -101,10 +101,10 @@ async function handleGet(req: VercelRequest, res: VercelResponse) {
 
 async function handlePost(req: VercelRequest, res: VercelResponse) {
   try {
-    let payload = req.body as SheetsPayload;
+    let payload = req.body as LeadPayload;
 
-    // A LP envia como text/plain (mesmo contrato do Apps Script); o body pode
-    // chegar como string bruta em vez de objeto já parseado.
+    // A LP envia como text/plain; o body pode chegar como string bruta em vez
+    // de objeto já parseado.
     if (typeof payload === 'string') {
       try {
         payload = JSON.parse(payload);

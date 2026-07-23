@@ -36,8 +36,11 @@ Dra. Karyne Magalhães (halitose/Goiânia) — isso é esperado, é edição man
 - **Fora de escopo desta fase, ainda hardcoded**: marca/textos/cores/copy da LP
   (edição de conteúdo manual por cliente, sem sistema de templating — também
   documentado em `docs/CUSTOMIZAR-POR-CLIENTE.md`), domínio (responsabilidade do
-  deploy/DNS por cliente, não é código), URL do Google Apps Script em
-  `QualificationModal.tsx` (planilha de backup da Karyne, não avaliado nesta fase).
+  deploy/DNS por cliente, não é código).
+- **Removido do template**: o envio de leads para uma planilha Google Sheets via
+  Google Apps Script (mecanismo legado, específico da Karyne, pré-existente ao
+  mini CRM) foi completamente removido. Clientes novos usam só o Supabase
+  (`/api/leads` → Postgres → painel `/admin`), único mecanismo de ingestão.
 
 Ver memória do projeto `produto-lp-multicliente` (sessão Claude) e
 `docs/handoff-fechar-loop-conversoes.md` /
